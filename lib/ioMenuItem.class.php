@@ -235,7 +235,10 @@ class ioMenuItem implements ArrayAccess, Countable, IteratorAggregate
     }
 
     // if i18n isn't used or if no i18n label was found, use the default method
-    return ($this->_label !== null) ? $this->_label : $this->_name;
+    $label = ($this->_label !== null) ? $this->_label : $this->_name;
+    
+    include_once(sfConfig::get('sf_symfony_lib_dir').'/helper/I18NHelper.php');
+    return __($label);
   }
 
   /**
