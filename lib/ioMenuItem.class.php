@@ -3,9 +3,9 @@
 /**
  * This is your base menu item. It roughly represents a single <li> tag
  * and is what you should interact with most of the time by default.
- * 
+ *
  * Originally taken from sympal (http://www.sympalphp.org)
- * 
+ *
  * @package     ioMenuPlugin
  * @subpackage  menu
  * @author      Jonathan H. Wage <jonwage@gmail.com>
@@ -60,7 +60,7 @@ class ioMenuItem implements ArrayAccess, Countable, IteratorAggregate
 
   /**
    * Class constructor
-   * 
+   *
    * @param string $name    The name of this menu, which is how its parent will
    *                        reference it. Also used as label if label not specified
    * @param string $route   The route/url for this menu to use. If not specified,
@@ -69,7 +69,7 @@ class ioMenuItem implements ArrayAccess, Countable, IteratorAggregate
    */
   public function __construct($name, $route = null, $attributes = array())
   {
-    sfApplicationConfiguration::getActive()->loadHelpers(array('Tag', 'Url'));
+    sfApplicationConfiguration::getActive()->loadHelpers(array('Tag', 'Url', 'I18N'));
 
     $this->_name = $name;
     $this->_route = $route;
@@ -78,12 +78,12 @@ class ioMenuItem implements ArrayAccess, Countable, IteratorAggregate
 
   /**
    * Generates the url to this menu item based on the route
-   * 
+   *
    * @param array $options Options to pass to the url_for method
    */
   public function getUri(array $options = array())
   {
-    if (!$this->getRoute() || $this->getRoute() == '#')
+    if (!$this->getRoute())
     {
       return null;
     }
@@ -236,13 +236,13 @@ class ioMenuItem implements ArrayAccess, Countable, IteratorAggregate
 
     // if i18n isn't used or if no i18n label was found, use the default method
     $label = ($this->_label !== null) ? $this->_label : $this->_name;
-    include_once(sfConfig::get('sf_symfony_lib_dir').'/helper/I18NHelper.php');
     return __($label);
+
   }
 
   /**
    * @param  string $label    The text to use when rendering this menu item
-   * @param  string $culture  The i18n culture to set this label for 
+   * @param  string $culture  The i18n culture to set this label for
    * @return ioMenuItem
    */
   public function setLabel($label, $culture = null)
@@ -291,7 +291,7 @@ class ioMenuItem implements ArrayAccess, Countable, IteratorAggregate
     {
       return $this->getParent()->getCulture();
     }
-    
+
     // if we're the root, get from the context or return the default
     if (sfContext::hasInstance())
     {
@@ -323,7 +323,7 @@ class ioMenuItem implements ArrayAccess, Countable, IteratorAggregate
   }
 
   /**
-   * @param  array $attributes 
+   * @param  array $attributes
    * @return ioMenuItem
    */
   public function setAttributes($attributes)
@@ -336,7 +336,7 @@ class ioMenuItem implements ArrayAccess, Countable, IteratorAggregate
   /**
    * @param  string $name     The name of the attribute to return
    * @param  mixed  $default  The value to return if the attribute doesn't exist
-   * 
+   *
    * @return mixed
    */
   public function getAttribute($name, $default = null)
@@ -634,7 +634,7 @@ class ioMenuItem implements ArrayAccess, Countable, IteratorAggregate
   public function slice($offset, $length = 0)
   {
     $count = $this->count();
-    
+
     $names = array_keys($this->getChildren());
     if (is_numeric($offset))
     {
@@ -710,7 +710,7 @@ class ioMenuItem implements ArrayAccess, Countable, IteratorAggregate
 
   /**
    * Split menu into two distinct menus.
-   * 
+   *
    * @param mixed $length Name of child, child object, or numeric length.
    * @return array Array with two menus, with "primary" and "secondary" key
    */
@@ -909,7 +909,7 @@ class ioMenuItem implements ArrayAccess, Countable, IteratorAggregate
   {
     $this->_linkOptions = $linkOptions;
   }
-  
+
 
   /**
    * Returns the index that this child is within its parent.
@@ -939,7 +939,7 @@ class ioMenuItem implements ArrayAccess, Countable, IteratorAggregate
    * Reset children nums.
    *
    * Primarily called after changes to children (removing, reordering, etc)
-   * 
+   *
    * @return void
    */
   protected function _resetChildrenNum()
@@ -953,11 +953,11 @@ class ioMenuItem implements ArrayAccess, Countable, IteratorAggregate
 
   /**
    * Creates a new ioMenuItem to be the child of this menu
-   * 
+   *
    * @param string  $name
    * @param string  $route
    * @param array   $attributes
-   * 
+   *
    * @return ioMenuItem
    */
   protected function _createChild($name, $route = null, $attributes = array(), $class = null)
@@ -972,13 +972,13 @@ class ioMenuItem implements ArrayAccess, Countable, IteratorAggregate
 
   /**
    * Removes a child from this menu item
-   * 
+   *
    * @param mixed $name The name of ioMenuItem instance to remove
    */
   public function removeChild($name)
   {
     $name = ($name instanceof ioMenuItem) ? $name->getName() : $name;
-    
+
     if (isset($this->_children[$name]))
     {
       // unset the child and reset it so it looks independent
@@ -1035,9 +1035,9 @@ class ioMenuItem implements ArrayAccess, Countable, IteratorAggregate
    *   * 1 - directly children only
    *   * 2 - children and grandchildren
    *
-   * @param integer $depth         The depth of children to render 
+   * @param integer $depth         The depth of children to render
    * @param boolean $renderAsChild Used internally to render with attributes on the write element
-   * 
+   *
    * @return string
    */
   public function render($depth = null, $renderAsChild = false)
@@ -1097,7 +1097,7 @@ class ioMenuItem implements ArrayAccess, Countable, IteratorAggregate
    * @return string
    */
   public function renderChildren($depth = null)
-  {  
+  {
     $html = '';
     foreach ($this->_children as $child)
     {
@@ -1120,7 +1120,7 @@ class ioMenuItem implements ArrayAccess, Countable, IteratorAggregate
     // if we don't have access or this item is marked to not be shown
     if (!$this->shouldBeRendered())
     {
-      return; 
+      return;
     }
 
     // explode the class string into an array of classes
@@ -1155,7 +1155,7 @@ class ioMenuItem implements ArrayAccess, Countable, IteratorAggregate
     $html = $this->_format('<li'._tag_options($attributes).'>', 'li');
 
     // render the text/link inside the li tag
-    $html .= $this->_format((null !== $this->_route) ? $this->renderLink() : $this->renderLabel(), 'link');
+    $html .= $this->_format($this->_route ? $this->renderLink() : $this->renderLabel(), 'link');
 
     // renders the embedded ul if there are visible children
     $html .= $this->render($depth, true);
@@ -1172,7 +1172,7 @@ class ioMenuItem implements ArrayAccess, Countable, IteratorAggregate
    * makes up its part in a fully-rendered and spaced menu.
    *
    * @param  string $html The html to render in an (un)formatted way
-   * @param  string $type The type [ul,link,li] of thing being rendered 
+   * @param  string $type The type [ul,link,li] of thing being rendered
    * @return string
    */
   protected function _format($html, $type)
@@ -1207,21 +1207,9 @@ class ioMenuItem implements ArrayAccess, Countable, IteratorAggregate
    */
   public function renderLink()
   {
-    if (null === ($route = $this->getRoute()))
+    if (!$route = $this->getRoute())
     {
       return $this->renderLabel();
-    }
-
-    // allow for "fake" hrefs
-    if ($route == '' || $route == '#')
-    {
-      $params = array_merge($this->getUrlOptions(), $this->getLinkOptions());
-      if ($route)
-      {
-        $params['href'] = $route;
-      }
-
-      return content_tag('a', $this->renderLabel(), $params);
     }
 
     // Handling of the url options and link options varies depending on the url format
@@ -1376,12 +1364,9 @@ class ioMenuItem implements ArrayAccess, Countable, IteratorAggregate
       $menuUrl = $this->getUri(array('absolute' => true));
 
       // a very dirty hack so homepages will match with or without the trailing slash
-      if ($this->getRoute() == '@homepage' || $this->getRoute() == 'homepage')
+      if ($this->getRoute() == '@homepage' && substr($url, -1) != '/')
       {
-        if (substr($url, -1) != '/')
-        {
-          $menuUrl = substr($menuUrl, 0, strlen($menuUrl) - 1);
-        }
+        $menuUrl = substr($menuUrl, 0, strlen($menuUrl) - 1);
       }
 
       $this->_isCurrent = ($menuUrl == $url);
@@ -1429,7 +1414,7 @@ class ioMenuItem implements ArrayAccess, Countable, IteratorAggregate
   }
 
   /**
-   * @return bool Whether or not this menu item is first in its parent 
+   * @return bool Whether or not this menu item is first in its parent
    */
   public function isFirst()
   {
@@ -1447,13 +1432,13 @@ class ioMenuItem implements ArrayAccess, Countable, IteratorAggregate
    * menu item, this function takes into consideration user credentials.
    *
    * This returns true if this is the first child that would be rendered
-   * for the current user 
+   * for the current user
    *
    * @return boolean
    */
   public function actsLikeFirst()
   {
-    // root items are never "marked" as first 
+    // root items are never "marked" as first
     if ($this->isRoot())
     {
       return false;
@@ -1535,7 +1520,7 @@ class ioMenuItem implements ArrayAccess, Countable, IteratorAggregate
          * This should look strange. But, if we ask our parent for the
          * current uri, and it returns it successfully, then one of two
          * different things just happened:
-         * 
+         *
          *   1) The parent already had the currentUri calculated, but it
          *      hadn't been passed down to the child yet. This technically
          *      should not happen, but we allow for the possibility. In
@@ -1618,7 +1603,6 @@ class ioMenuItem implements ArrayAccess, Countable, IteratorAggregate
       '_requiresNoAuth' => 'requires_no_auth',
       '_credentials'    => 'credentials',
       '_linkOptions'    => 'link_options',
-      '_urlOptions'     => 'url_options',
     );
 
     // output the i18n labels if any are set
@@ -1687,7 +1671,7 @@ class ioMenuItem implements ArrayAccess, Countable, IteratorAggregate
     {
       $this->requiresAuth($array['requires_auth']);
     }
-    
+
     if (isset($array['requires_no_auth']))
     {
       $this->requiresNoAuth($array['requires_no_auth']);
@@ -1701,11 +1685,6 @@ class ioMenuItem implements ArrayAccess, Countable, IteratorAggregate
 		if (isset($array['link_options']))
 		{
 			$this->setLinkOptions($array['link_options']);
-		}
-
-		if (isset($array['url_options']))
-		{
-			$this->setUrlOptions($array['url_options']);
 		}
 
     if (isset($array['children']))
@@ -1726,7 +1705,7 @@ class ioMenuItem implements ArrayAccess, Countable, IteratorAggregate
    *
    * The source is an array of data that should match the output from ->toArray().
    *
-   * @param  array $data The array of data to use as a source for the menu tree 
+   * @param  array $data The array of data to use as a source for the menu tree
    * @return ioMenuItem
    */
   public static function createFromArray(array $data)
@@ -1803,7 +1782,7 @@ class ioMenuItem implements ArrayAccess, Countable, IteratorAggregate
 
   /**
    * Throws an io.menu.method_not_found event.
-   * 
+   *
    * This allows anyone to hook into the event and effectively add methods
    * to this class
    */
